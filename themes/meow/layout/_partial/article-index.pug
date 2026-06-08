@@ -1,0 +1,36 @@
+article.index-post-item
+  //- 文章标题
+  .post-title-index
+    h1
+      a(href= url_for(post.path))
+        i.fa-solid.fa-paw
+        | #{ post.title }
+    
+    if post.sticky
+      .post-top
+        | !{ markdown(__('article.top'))}
+
+  .post-head-info
+    //- post's date info 文章日期相关信息
+    | !{ partial('_partial/post/date') }
+
+    //- post's categories info 文章分类
+    | !{ partial('_partial/post/post-categories') }
+
+  //- post's excerpt 文章摘要
+  .post-excerpt
+    if post.excerpt
+      | !{ post.excerpt }
+    else if post.summary
+      | !{ markdown(post.summary) }
+    else
+      //- generate excerpt automatically if no excerpt 如果没有可用的摘要则自动生成摘要
+      | !{ truncate(strip_html(post.content), {length: theme.excerpt_length}) }
+
+  //- read more button "阅读全文"按钮
+  .read-more
+    i.fa-solid.fa-paw.fa-xs
+    a.read-more-link(href= url_for(post.path))= __('article.read_more')
+
+  //- post's tags info 文章标签
+  | !{ partial('_partial/post/post-tags') }

@@ -1,0 +1,166 @@
+# Theme Configuration 主题配置
+# Source: https://github.com/chanwj/hexo-theme-meow
+# Docs: https://chanwj.github.io
+
+# theme version 主题所使用的版本
+version: v2.1.5
+
+# site icon 网站图标
+blog_pic: img/site-icon.jpg
+
+# author picture 作者头像
+author_pic: img/author.jpg
+
+# background image/color 背景图片/颜色
+background:
+  type: 3 # 1: image 图片 | 2: color 颜色 | 3: gradient style 渐变
+  color: # (css color name css颜色名称) 'MistyRose' | (color code 颜色代码) '#FFE4E1'
+  image_url: images/Spiritfarer-1.png # image path 图片路径
+  gradient: linear-gradient(to bottom right, #FFE082, #FFB84D) # 奶黄渐变 cream-yellow gradient
+  attachment: fixed # background scrollable 背景是否可以随页面滚动: scroll | fixed
+
+# menu config 导航栏菜单项
+# archives/categories/tags will use the path in root config automatically 归档、分类以及标签页使用根目录配置中的路径
+# other custom pages require path configuration manually 其他自定义页面需要配置页面路径
+menu:
+  关于: /about
+  项目集: /categories/Projects/
+  随手记: /categories/Notes/
+  学习笔记: /categories/Study/
+  archives:
+  tags:
+
+# search function 搜索功能
+search:
+  enable: true
+
+# site register info 网站备案信息（比如ICP）
+register_info:
+  enable: false
+  record_info: 京ICP备………………号
+  query_url: https://beian.miit.gov.cn/
+
+# the year that this site was built 创建网站的年份
+since_year: 2026
+
+# users can select text content 允许用户选取网站上的文本内容
+selectable: true
+
+# toc of post 文章目录导航栏
+toc:
+  enable: true
+  list_number: true # show list number 是否显示编号
+  max_depth: 6 # Maximum heading depth of generated toc 生成 TOC 的最大深度
+  max_items: Infinity # Maximum number of items in generated toc, default: Infinity 生成的toc的最大项目数，默认为Infinity无限
+
+# count words in post 文章字数统计
+word_count:
+  enable: true
+
+# indent the first line of paragraph in post by 2em 文章段落首行缩进2字符
+text_indent:
+  enable: false
+
+# copyright statement 版权声明（比如CC协议）
+copyright:
+  enable: true
+  license: CC BY-NC-ND 4.0
+  link: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans
+
+# the length of post auto excerpt 文章自动摘要的字符长度
+excerpt_length: 200
+
+# tags page config 标签页面设置
+tags:
+  show_count: true # show posts total count of each tag 显示每个标签的文章总数
+  tag_cloud: true
+  tag_list: false
+
+# categories page config 分类页面设置
+categories:
+  show_count: true # show posts total count of each category 显示每个分类的文章总数
+  depth: 0 # decide the depth of categories to display: 0-all, 1-only first layer... 显示分类层级：0-显示全部层级，1-只显示第一层……
+
+# page view counting(with busuanzi) 访问量统计（使用不蒜子）
+page_view:
+  enable: true
+  site_pv: true # show site's page view 显示网站访问量信息
+  post_pv: true # show post's page view 显示文章访问量信息
+
+# contact information 联系方式
+contact_info:
+  Email: u3665747@connect.hku.hk
+  Github: https://github.com/Liz-Lee-HK
+  QQ:
+  Twitter:
+  Facebook:
+  Instagram:
+  Tiktok:
+  Bilibili:
+  Weibo:
+  AO3:
+  Mastodon:
+
+# other links to display 其他链接 (友链,以后用)
+links:
+  enable: false
+  links_list:
+    hexo-theme-meow:
+      desc: 本主题的Github仓库
+      url: https://github.com/chanwj/hexo-theme-meow
+
+# reward module 赞赏栏目 (个人求职站关闭)
+reward:
+  enable: false
+  QR_code:
+    Wechat: /img/reward/wechat.jpg
+    Alipay: /img/reward/alipay.jpg
+
+# show 'previous article' and 'next article' at the end of post
+post_prev_next: true
+
+# the root of site's path
+root: /
+
+# comment module (using Giscus) 评论模块 (暂时关闭,以后想加再配)
+comment:
+  post_enable: false
+  about_enable: false
+  data_repo:
+  data_repo_id:
+  data_category:
+  data_category_id:
+  data_mapping:
+  data_strict:
+  data_reactions_enabled:
+  data_emit_metadata:
+  data_input_position:
+  data_theme:
+  data_lang:
+  data_loading:
+  crossorigin:
+
+# credits module 致谢栏目
+credits:
+  enable: true
+  credits_list: '感谢 **[hexo-theme-meow](https://github.com/chanwj/hexo-theme-meow)** by [chanwj](https://github.com/chanwj)'
+
+# font config 字体配置 (Quicksand 英文 + Noto Sans SC 中文)
+font:
+  url_list:
+    - 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300..700&display=swap'
+    - 'https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap'
+  font_family: "'Quicksand', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Sans-serif, Serif"
+
+# toolbar configuration 悬浮工具栏配置
+tool_bar:
+  more_tools: true
+  setting_font_size: true
+
+# darkmode 深色模式 (跟随系统)
+darkmode:
+  enable: true
+  start_at: 24:00
+  end_at: 06:00
+  check_system_scheme: true
+  save_on_toggle: true
