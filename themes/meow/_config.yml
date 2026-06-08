@@ -16,7 +16,7 @@ background:
   type: 3 # 1: image 图片 | 2: color 颜色 | 3: gradient style 渐变
   color: # (css color name css颜色名称) 'MistyRose' | (color code 颜色代码) '#FFE4E1'
   image_url: images/Spiritfarer-1.png # image path 图片路径
-  gradient: linear-gradient(to bottom right, #FFE082, #FFB84D) # 奶黄渐变 cream-yellow gradient
+  gradient: 'linear-gradient(to bottom right, #FFE082, #FFB84D)' # 奶黄渐变 cream-yellow gradient
   attachment: fixed # background scrollable 背景是否可以随页面滚动: scroll | fixed
 
 # menu config 导航栏菜单项
