@@ -5,6 +5,10 @@ menu:
   categories: 分类
   tags: 标签
   about: 关于
+  关于: 关于
+  项目集: 项目集
+  随手记: 随手记
+  学习笔记: 学习笔记
   search: 搜索
   home: 主页
   toc: 目录
@@ -17,9 +21,9 @@ menu:
 # 网站信息
 # 此处的配置仅影响页内展示，不影响网页meta
 blog_info:
-  title: MEOW
-  subtitle: 可爱明亮的Hexo主题
-  description: Hexo主题「Meow」展示站。本主题尤其适用于发布原创小说、同人二创等文学作品。
+  title: Liz Lee
+  subtitle: AI / LLM Agent Engineer-in-training · HKU
+  description: 大模型 / Agent 八股复盘 · 项目集 · 随手记 · 学习笔记
 
 # 文章相关显示值
 article:
@@ -89,21 +93,16 @@ fiction:
 about:
   about_blog:
     title: 关于本站
-    # 博客关键词，以','分隔
-    keywords: Hexo,主题,博客,开源,教程
-    # 介绍博客，支持Markdown语法
-    introduction: '- 「Meow」是一款可应用于Hexo博客框架的主题，源码已在[Github](https://github.com/chanwj/hexo-theme-meow)上公开。
-    
-    - 本主题风格可爱，色彩明亮，希望大家看到就能拥有一份好心情～
-    
-    - 除了支持博客的基本用途之外，本主题还针对文学创作进行了优化，让各位作者大大可以更方便地使用模板发表原创小说、同人作品。
-    
-    - 本站全方位地展示了这款主题的应用效果，并且发布了相关的安装配置指南，可供大家参考使用。'
-    # 补充说明/备注，支持Markdown语法
-    supplement: '&#127775;<u>这是作者投入许多时间与精力制作而成的作品，如果您需要使用本主题，**请保留页脚部分的主题版权信息**，尊重作者与创作，这样也可以帮助更多有需要的人了解本主题，非常感谢！</u>'
+    keywords: AI,LLM,Agent,RAG,大模型,八股,面试
+    introduction: '- 这里是 Liz Lee 的个人博客，记录我在 AI / LLM Agent 领域的学习与项目。
+
+    - 内容包括大模型八股复盘、论文笔记、项目实战和日常随写。
+
+    - 本站基于 [Hexo](https://hexo.io/) 搭建，使用 [hexo-theme-meow](https://github.com/chanwj/hexo-theme-meow) 主题。'
+    supplement: '&#127775;<u>感谢 [chanwj](https://github.com/chanwj) 制作的主题，**请保留页脚部分的主题版权信息**，尊重作者与创作。</u>'
   about_author:
     title: 关于作者
-    description: 一只既写小说又敲代码的橘猫，是个糕手。
+    description: HKU 在读，AI / LLM Agent 工程师预备役。写八股也写代码，偶尔随手记。
   about_contact: 联系方式
   about_links: 其他链接
   reward:
