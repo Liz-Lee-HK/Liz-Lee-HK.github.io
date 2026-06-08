@@ -6,7 +6,7 @@
 version: v2.1.5
 
 # site icon 网站图标
-blog_pic: img/site-icon.jpg
+blog_pic: img/site-icon.png
 
 # author picture 作者头像
 author_pic: img/author.jpg
@@ -16,7 +16,7 @@ background:
   type: 3 # 1: image 图片 | 2: color 颜色 | 3: gradient style 渐变
   color: # (css color name css颜色名称) 'MistyRose' | (color code 颜色代码) '#FFE4E1'
   image_url: images/Spiritfarer-1.png # image path 图片路径
-  gradient: 'linear-gradient(to bottom right, #FFE082, #FFB84D)' # 奶黄渐变 cream-yellow gradient
+  gradient: linear-gradient(to bottom right,#ffa751,#ffe259) # gradient css statement 渐变css语句
   attachment: fixed # background scrollable 背景是否可以随页面滚动: scroll | fixed
 
 # menu config 导航栏菜单项
@@ -71,6 +71,7 @@ copyright:
 excerpt_length: 200
 
 # tags page config 标签页面设置
+# tag cloud & tag list: just choose one to display 标签云与标签列表只需要选择其一显示
 tags:
   show_count: true # show posts total count of each tag 显示每个标签的文章总数
   tag_cloud: true
@@ -87,7 +88,9 @@ page_view:
   site_pv: true # show site's page view 显示网站访问量信息
   post_pv: true # show post's page view 显示文章访问量信息
 
-# contact information 联系方式
+# contact information, add item in 'name: url' format, stay blank if you don't want to show that item 联系方式，新增项请按'名称: 链接网址'配置，不需要显示的项目则置空
+# currently support icons of items below, any other links will be display in paw icon 目前支持以下网站图标，其他链接统一用猫爪图标显示
+# Email|邮箱,Github,Twitter,Facebook,Instagram,Tiktok|抖音,Bilibili,Weibo|微博,Mastodon,Wechat|微信
 contact_info:
   Email: u3665747@connect.hku.hk
   Github: https://github.com/Liz-Lee-HK
@@ -101,7 +104,7 @@ contact_info:
   AO3:
   Mastodon:
 
-# other links to display 其他链接 (友链,以后用)
+# other links to display 其他链接
 links:
   enable: false
   links_list:
@@ -109,23 +112,25 @@ links:
       desc: 本主题的Github仓库
       url: https://github.com/chanwj/hexo-theme-meow
 
-# reward module 赞赏栏目 (个人求职站关闭)
+# reward module 赞赏栏目
 reward:
   enable: false
-  QR_code:
-    Wechat: /img/reward/wechat.jpg
+  QR_code: # list your payment QR Code so that users can pay you a coffee 列出你的收款二维码，让用户可以扫描打赏
+    Wechat: /img/reward/wechat.jpg # payment name: QRCode's image url 支付方式名称: 二维码图片路径
     Alipay: /img/reward/alipay.jpg
 
-# show 'previous article' and 'next article' at the end of post
+# show 'previous article' and 'next article' at the end of post 在文章最后生成'上一篇'和'下一篇'文章的链接
 post_prev_next: true
 
-# the root of site's path
+# the root of site's path, must be as same as the 'root' configuration in the root's _config.yml 网站根目录，填写值与根目录下的_config.yml中的root项必须一致
+# if this site was not deployed on a project page(e.g. username.github.io/repository), the default root should be '/' 若网站并非部署在子目录下，root则默认为'/'
 root: /
 
-# comment module (using Giscus) 评论模块 (暂时关闭,以后想加再配)
+# comment module (using Giscus) 评论模块（使用Giscus）
+# get configuration value through giscus.app 配置值请通过giscus.app获取
 comment:
-  post_enable: false
-  about_enable: false
+  post_enable: false # add comment module at posts 在文章页面增加评论模块
+  about_enable: false # add comment module at about page 在关于页增加评论模块
   data_repo:
   data_repo_id:
   data_category:
@@ -137,30 +142,37 @@ comment:
   data_input_position:
   data_theme:
   data_lang:
-  data_loading:
+  data_loading: # stay blank if you don't want to load comments lazily 如不启用懒加载则置空此项
   crossorigin:
 
 # credits module 致谢栏目
 credits:
   enable: true
+  # list people you want to express gratitude, Markdown available 致谢名单，支持Markdown语法
   credits_list: '感谢 **[hexo-theme-meow](https://github.com/chanwj/hexo-theme-meow)** by [chanwj](https://github.com/chanwj)'
 
-# font config 字体配置 (Quicksand 英文 + Noto Sans SC 中文)
+# font config 字体配置
 font:
+  # import fonts links, use Google Fonts 导入字体链接，使用谷歌字体库
+  # format: - 'url' 配置格式：- 'url'
+  # recommended fonts 推荐字体
+  # https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400..700&display=swap
+  # https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap
+  # https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300..700&display=swap
   url_list:
     - 'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300..700&display=swap'
-    - 'https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap'
-  font_family: "'Quicksand', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Sans-serif, Serif"
+  # use fonts, please keep the content in double quotation marks and seperate each font with comma 使用字体，请用双引号将全部字体包裹起来，逗号分隔不同字体
+  font_family: "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', Sans-serif, Serif"
 
 # toolbar configuration 悬浮工具栏配置
 tool_bar:
-  more_tools: true
-  setting_font_size: true
+  more_tools: true # display more function button available (e.g. darkmode) 展示更多可用的功能按钮（比如深色模式）
+  setting_font_size: true # increase or decrease font size of post 增大或减小文章字体
 
-# darkmode 深色模式 (跟随系统)
+# darkmode 深色模式
 darkmode:
   enable: true
-  start_at: 24:00
-  end_at: 06:00
-  check_system_scheme: true
-  save_on_toggle: true
+  start_at: 24:00 # time to start dark theme 自动切换深色模式的开始时间
+  end_at: 06:00 # time to end dark theme 自动切换深色模式的结束时间
+  check_system_scheme: true # check if system indicates light or dark color themes 检查系统是否指定模式
+  save_on_toggle: true # save current mode in local storage 在本地保存现有模式
