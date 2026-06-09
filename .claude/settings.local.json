@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/liruolin/Desktop/HKU/7706/**)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 generate_logbooks.py)",
+      "Bash(python3 *)"
+    ]
+  }
+}

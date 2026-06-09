@@ -56,7 +56,6 @@ menu:
   随手记: /categories/Notes/ || uc-article
   学习笔记: /categories/Study/ || uc-article
   archives: /archives || uc-archive
-  tags: /tags || uc-tag
 
 # Navigation Bar Configuration
 menu_options:
