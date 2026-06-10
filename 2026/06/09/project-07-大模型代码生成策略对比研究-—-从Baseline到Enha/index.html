@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Liz Lee"/><meta name="copyright" content="Liz Lee"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="LLM,Code Generation,Self-Refine,Prompt Engineering,HumanEval,Qwen"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化 | Liz Lee"/><meta name="apple-mobile-web-app-title" content="大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化 | Liz Lee"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://liz-lee-hk.github.io/2026/06/09/project-07-大模型代码生成策略对比研究-—-从Baseline到Enha/"/><meta name="description" content="项目概述基于HumanEval基准（164个Python函数生成任务），系统性地研究并实现了四种大模型代码生成策略：Baseline（零样本）、Self-Refine（自我反思迭代）、Lever（多样本投票）以及Enhanced Self-Refine（增强型自我修正）。该项目通过严谨的实验设计，揭示了不同推理策略在准确率、Token消耗和运行时间之间的权衡关系。 背景与动机代码生成是大语言...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化 | Liz Lee">
+<meta property="og:url" content="https://liz-lee-hk.github.io/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/index.html">
+<meta property="og:site_name" content="Liz Lee">
+<meta property="og:description" content="项目概述基于HumanEval基准（164个Python函数生成任务），系统性地研究并实现了四种大模型代码生成策略：Baseline（零样本）、Self-Refine（自我反思迭代）、Lever（多样本投票）以及Enhanced Self-Refine（增强型自我修正）。该项目通过严谨的实验设计，揭示了不同推理策略在准确率、Token消耗和运行时间之间的权衡关系。 背景与动机代码生成是大语言...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liz-lee-hk.github.io/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/assets/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-06-09T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-10T08:59:10.970Z">
+<meta property="article:author" content="Liz Lee">
+<meta property="article:tag" content="Code Generation">
+<meta property="article:tag" content="HumanEval">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="Prompt Engineering">
+<meta property="article:tag" content="Qwen">
+<meta property="article:tag" content="Self-Refine">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://liz-lee-hk.github.io/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/assets/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化 | Liz Lee</title><link rel="shortcut icon" href="/assets/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+
+<link rel="stylesheet" href="/css/third-party/dist/APlayer.min.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.2"></head><body bg-style="none"><div class="post-progressbar-container"><div class="post-progressbar"></div></div><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>Liz Lee</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div></div><div id="nav-function"><div id="search-btn"><a href="javascript:void(0);" title="搜索" accesskey="s"><img src="/assets/images/svg/uc/uc-search.svg" class="icon noview" alt="Icon"><span>搜索</span></a></div><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">Liz Lee</a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-aside-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-aside-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-aside-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">Liz Lee</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化</h1><div class="post-author"><span>作者: Liz Lee</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-06-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-06-10</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/Projects/">Projects</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/Code-Generation/" rel="tag">Code Generation</a><a class="post-tags-link" href="/tags/HumanEval/" rel="tag">HumanEval</a><a class="post-tags-link" href="/tags/LLM/" rel="tag">LLM</a><a class="post-tags-link" href="/tags/Prompt-Engineering/" rel="tag">Prompt Engineering</a><a class="post-tags-link" href="/tags/Qwen/" rel="tag">Qwen</a><a class="post-tags-link" href="/tags/Self-Refine/" rel="tag">Self-Refine</a></span></div></div></div><div class="post markdown" indent="false"><h2 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h2><p>基于HumanEval基准（164个Python函数生成任务），系统性地研究并实现了四种大模型代码生成策略：Baseline（零样本）、Self-Refine（自我反思迭代）、Lever（多样本投票）以及Enhanced Self-Refine（增强型自我修正）。该项目通过严谨的实验设计，揭示了不同推理策略在准确率、Token消耗和运行时间之间的权衡关系。</p>
+<h2 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h2><p>代码生成是大语言模型最受关注的应用方向之一。然而，单次零样本生成往往存在准确率瓶颈——模型可能在边界条件、类型推断和逻辑细节上出错。如何通过推理阶段的策略优化来提升代码生成质量，是LLM应用落地的核心问题。</p>
+<h2 id="技术方案"><a href="#技术方案" class="headerlink" title="技术方案"></a>技术方案</h2><h3 id="1-四种策略实现"><a href="#1-四种策略实现" class="headerlink" title="1. 四种策略实现"></a>1. 四种策略实现</h3><ul>
+<li><strong>Baseline（准确率96.34%）</strong>：零样本生成，使用标准Prompt模板直接要求模型输出Python函数，采用贪心解码确保确定性输出</li>
+<li><strong>Self-Refine（准确率98.78%）</strong>：迭代式自我修正循环（最多3轮），模型先生成初始代码，然后对自身代码进行自我评估，识别错误后生成修正版本</li>
+<li><strong>Lever（准确率100%）</strong>：对每个任务生成3个候选样本，通过实际执行验证（execution-based verification）进行评分排序，选择最优结果；使用NumPy实现高效的排序与选择逻辑</li>
+<li><strong>Enhanced Self-Refine（准确率100%）</strong>：在Self-Refine基础上引入错误分类机制（语法错误、运行时错误、逻辑错误），针对不同错误类型提供定向反馈；增加二次重试通道和超时保护</li>
+</ul>
+<h3 id="2-Token消耗与延时权衡分析"><a href="#2-Token消耗与延时权衡分析" class="headerlink" title="2. Token消耗与延时权衡分析"></a>2. Token消耗与延时权衡分析</h3><ul>
+<li>详细记录了四种策略在全部164个任务上的Token消耗量和运行时间</li>
+<li>Enhanced Self-Refine虽然达到100%准确率，但Token消耗约为Baseline的3倍</li>
+<li>Lever策略在准确率和资源消耗之间取得了最优平衡</li>
+</ul>
+<h2 id="项目成果"><a href="#项目成果" class="headerlink" title="项目成果"></a>项目成果</h2><ul>
+<li>最佳策略（Lever &amp; Enhanced Self-Refine）达到100%准确率</li>
+<li>完成64页详细实验报告，包含方法对比、失败案例分析、Token经济学分析和改进建议</li>
+<li>验证了execution-based verification作为LLM输出质量控制手段的有效性</li>
+<li>为后续Agent系统中的代码生成模块提供了策略选择的经验依据</li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 Liz Lee 于 2026-06-10 07:00:00 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://liz-lee-hk.github.io/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/">大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化</a></span><button class="copy-text" type="button" data-text="https://liz-lee-hk.github.io/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>Liz Lee</a></div><img class="post-copyright-icon noview" src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/Code-Generation/" rel="tag">Code Generation</a><a class="post-tail-tags-link" href="/tags/HumanEval/" rel="tag">HumanEval</a><a class="post-tail-tags-link" href="/tags/LLM/" rel="tag">LLM</a><a class="post-tail-tags-link" href="/tags/Prompt-Engineering/" rel="tag">Prompt Engineering</a><a class="post-tail-tags-link" href="/tags/Qwen/" rel="tag">Qwen</a><a class="post-tail-tags-link" href="/tags/Self-Refine/" rel="tag">Self-Refine</a></div><div class="post-nav"><a class="post-nav-prev" href="/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/" title="从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类">上一篇<span>从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类</span></a><a class="post-nav-next" href="/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/" title="法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线">下一篇<span>法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线</span></a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="toc-list-text">项目概述</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="toc-list-text">背景与动机</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88"><span class="toc-list-text">技术方案</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#1-%E5%9B%9B%E7%A7%8D%E7%AD%96%E7%95%A5%E5%AE%9E%E7%8E%B0"><span class="toc-list-text">1. 四种策略实现</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#2-Token%E6%B6%88%E8%80%97%E4%B8%8E%E5%BB%B6%E6%97%B6%E6%9D%83%E8%A1%A1%E5%88%86%E6%9E%90"><span class="toc-list-text">2. Token消耗与延时权衡分析</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%88%90%E6%9E%9C"><span class="toc-list-text">项目成果</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://liz-lee-hk.github.io/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div><div class="search-overlay"><div class="search-container"><div class="search-header"><div class="search-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+搜索</div><div class="search-close-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 0 0 9 -9a9 9 0 0 0 -9 -9a9 9 0 0 0 -9 9a9 9 0 0 0 9 9z" /><path d="M9 8l6 8" /><path d="M15 8l-6 8" /></svg></div></div><div class="search-input-box"><input id="search-input" type="search" placeholder="请输入关键词进行站内搜索……" value="" maxlength="80"/></div><div class="search-result-container"><div class="search-result-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg></div></div></div></div><div id="music-player"></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">Liz Lee</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.3.2" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-06-08T00:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  album: '',
+  codeblock: true,
+  code_copy_text: false,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: true,
+    path: 'search.xml',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+  category: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/plugins/dist/APlayer.min.js"></script>
+<script>const initAplayer = (data) => {
+  if (!data.length) return;
+
+  const ap = new APlayer({
+    container: document.getElementById('music-player'),
+    fixed: true,
+    autoplay: false,
+    theme: '#FFB347',
+    loop: 'all',
+    order: 'list',
+    volume: 0.7,
+    lrcType: 3,
+    audio: data
+  });
+
+  ap.on('play', () => {
+    document.getElementById('music-player').setAttribute("play", "");
+  });
+  ap.on('pause', () => {
+    document.getElementById('music-player').removeAttribute("play");
+  });
+};
+
+const fetchData = () => {
+  fetch('')
+    .then(res => res.json())
+    .then(result => initAplayer(result));
+};
+
+if ('') {
+  document.addEventListener("DOMContentLoaded", fetchData);
+} else {
+  document.addEventListener("DOMContentLoaded", initAplayer());;
+}</script>
+<script src="/js/plugins/dist/search.js"></script>
+
+<script src="/js/main.js" type="module"></script>
+</div></body></html>

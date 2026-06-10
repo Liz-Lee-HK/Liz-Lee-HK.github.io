@@ -1,0 +1,125 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Liz Lee"/><meta name="copyright" content="Liz Lee"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="PyTorch,CLIP,Contrastive Learning,Multimodal,Transformer,Vision-Language"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类 | Liz Lee"/><meta name="apple-mobile-web-app-title" content="从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类 | Liz Lee"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://liz-lee-hk.github.io/2026/06/10/project-08-从零实现CLIP多模态对比学习模型-—-图像-文本跨模态检索/"/><meta name="description" content="项目概述独立实现并训练了一个完整的CLIP（Contrastive Language-Image Pre-training）多模态对比学习模型。该项目涉及图像编码器与文本编码器的联合训练、对称对比损失函数的设计，以及零样本图像分类的评估流水线。 背景与动机CLIP是OpenAI于2021年提出的里程碑式多模态模型，它首次证明了自然语言监督可以有效地训练视觉模型。理解和复现CLIP对于深入掌握...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类 | Liz Lee">
+<meta property="og:url" content="https://liz-lee-hk.github.io/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/index.html">
+<meta property="og:site_name" content="Liz Lee">
+<meta property="og:description" content="项目概述独立实现并训练了一个完整的CLIP（Contrastive Language-Image Pre-training）多模态对比学习模型。该项目涉及图像编码器与文本编码器的联合训练、对称对比损失函数的设计，以及零样本图像分类的评估流水线。 背景与动机CLIP是OpenAI于2021年提出的里程碑式多模态模型，它首次证明了自然语言监督可以有效地训练视觉模型。理解和复现CLIP对于深入掌握...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liz-lee-hk.github.io/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/assets/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-06-10T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-10T08:59:10.970Z">
+<meta property="article:author" content="Liz Lee">
+<meta property="article:tag" content="CLIP">
+<meta property="article:tag" content="Contrastive Learning">
+<meta property="article:tag" content="Multimodal">
+<meta property="article:tag" content="PyTorch">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="Vision-Language">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://liz-lee-hk.github.io/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/assets/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类 | Liz Lee</title><link rel="shortcut icon" href="/assets/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+
+<link rel="stylesheet" href="/css/third-party/dist/APlayer.min.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.2"></head><body bg-style="none"><div class="post-progressbar-container"><div class="post-progressbar"></div></div><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>Liz Lee</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div></div><div id="nav-function"><div id="search-btn"><a href="javascript:void(0);" title="搜索" accesskey="s"><img src="/assets/images/svg/uc/uc-search.svg" class="icon noview" alt="Icon"><span>搜索</span></a></div><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">Liz Lee</a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-aside-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-aside-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-aside-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">Liz Lee</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类</h1><div class="post-author"><span>作者: Liz Lee</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-06-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-06-10</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/Projects/">Projects</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/CLIP/" rel="tag">CLIP</a><a class="post-tags-link" href="/tags/Contrastive-Learning/" rel="tag">Contrastive Learning</a><a class="post-tags-link" href="/tags/Multimodal/" rel="tag">Multimodal</a><a class="post-tags-link" href="/tags/PyTorch/" rel="tag">PyTorch</a><a class="post-tags-link" href="/tags/Transformer/" rel="tag">Transformer</a><a class="post-tags-link" href="/tags/Vision-Language/" rel="tag">Vision-Language</a></span></div></div></div><div class="post markdown" indent="false"><h2 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h2><p>独立实现并训练了一个完整的CLIP（Contrastive Language-Image Pre-training）多模态对比学习模型。该项目涉及图像编码器与文本编码器的联合训练、对称对比损失函数的设计，以及零样本图像分类的评估流水线。</p>
+<h2 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h2><p>CLIP是OpenAI于2021年提出的里程碑式多模态模型，它首次证明了自然语言监督可以有效地训练视觉模型。理解和复现CLIP对于深入掌握多模态AI、对比学习以及视觉-语言对齐技术至关重要。本项目是我在HKU攻读期间对多模态学习的一次系统性实践。</p>
+<h2 id="技术方案"><a href="#技术方案" class="headerlink" title="技术方案"></a>技术方案</h2><h3 id="1-双塔编码器架构"><a href="#1-双塔编码器架构" class="headerlink" title="1. 双塔编码器架构"></a>1. 双塔编码器架构</h3><ul>
+<li><strong>图像编码器</strong>：分别实验了ResNet50（CNN架构）和Vision Transformer ViT-B&#x2F;16（Transformer架构），使用预训练权重冻结，提取图像特征</li>
+<li><strong>文本编码器</strong>：选用RoBERTa-base作为文本编码器，同样冻结预训练权重，提取文本语义表征</li>
+<li><strong>投影头</strong>：在图像和文本编码器之上各自添加可训练的线性投影层，将两者映射到相同的嵌入空间</li>
+</ul>
+<h3 id="2-对称对比损失"><a href="#2-对称对比损失" class="headerlink" title="2. 对称对比损失"></a>2. 对称对比损失</h3><ul>
+<li>实现从零开始的对称对比损失函数（Symmetric Contrastive Loss）：同时计算图像→文本和文本→图像两个方向的cross-entropy loss，取平均值</li>
+<li>这与InfoNCE loss同源，目标是最大化匹配的图-文对之间的余弦相似度，同时最小化不匹配对之间的相似度</li>
+</ul>
+<h3 id="3-训练与评估流水线"><a href="#3-训练与评估流水线" class="headerlink" title="3. 训练与评估流水线"></a>3. 训练与评估流水线</h3><ul>
+<li>在ImageNet-1K的50类子集上训练投影头参数</li>
+<li>使用Hugging Face Trainer API管理训练循环，支持梯度累积、学习率预热、混合精度训练</li>
+<li>零样本评估：在测试集上直接使用文本Prompt（「a photo of a {class_name}」）进行分类，无需任何fine-tuning</li>
+</ul>
+<h2 id="项目成果"><a href="#项目成果" class="headerlink" title="项目成果"></a>项目成果</h2><ul>
+<li>成功实现CLIP模型在零样本设定下的图像分类，验证了对比学习在多模态对齐中的有效性</li>
+<li>完成了CNN（ResNet50）和Transformer（ViT）两种图像编码器方案的对比实验</li>
+<li>使用safetensors格式存储模型权重，支持高效加载与推断</li>
+<li>模型可为每个测试图像输出Top-10预测结果，便于后续分析与可视化</li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 Liz Lee 于 2026-06-10 08:00:00 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://liz-lee-hk.github.io/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/">从零实现CLIP多模态对比学习模型 — 图像-文本跨模态检索与零样本分类</a></span><button class="copy-text" type="button" data-text="https://liz-lee-hk.github.io/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>Liz Lee</a></div><img class="post-copyright-icon noview" src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/CLIP/" rel="tag">CLIP</a><a class="post-tail-tags-link" href="/tags/Contrastive-Learning/" rel="tag">Contrastive Learning</a><a class="post-tail-tags-link" href="/tags/Multimodal/" rel="tag">Multimodal</a><a class="post-tail-tags-link" href="/tags/PyTorch/" rel="tag">PyTorch</a><a class="post-tail-tags-link" href="/tags/Transformer/" rel="tag">Transformer</a><a class="post-tail-tags-link" href="/tags/Vision-Language/" rel="tag">Vision-Language</a></div><div class="post-nav"><a class="post-nav-prev" href="/2026/06/10/project-09-%E6%99%BA%E8%83%BD%E6%B1%82%E8%81%8C%E5%8A%A9%E6%89%8B-%E2%80%94-%E5%9F%BA%E4%BA%8EQwen2.5-7B-LoRA%E5%BE%AE%E8%B0%83%E4%B8%8E%E6%B7%B7/" title="智能求职助手 — 基于Qwen2.5-7B LoRA微调与混合推理架构的AI面试Agent">上一篇<span>智能求职助手 — 基于Qwen2.5-7B LoRA微调与混合推理架构的AI面试Agent</span></a><a class="post-nav-next" href="/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/" title="大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化">下一篇<span>大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化</span></a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="toc-list-text">项目概述</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="toc-list-text">背景与动机</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88"><span class="toc-list-text">技术方案</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#1-%E5%8F%8C%E5%A1%94%E7%BC%96%E7%A0%81%E5%99%A8%E6%9E%B6%E6%9E%84"><span class="toc-list-text">1. 双塔编码器架构</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#2-%E5%AF%B9%E7%A7%B0%E5%AF%B9%E6%AF%94%E6%8D%9F%E5%A4%B1"><span class="toc-list-text">2. 对称对比损失</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#3-%E8%AE%AD%E7%BB%83%E4%B8%8E%E8%AF%84%E4%BC%B0%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="toc-list-text">3. 训练与评估流水线</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%88%90%E6%9E%9C"><span class="toc-list-text">项目成果</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://liz-lee-hk.github.io/2026/06/10/project-08-%E4%BB%8E%E9%9B%B6%E5%AE%9E%E7%8E%B0CLIP%E5%A4%9A%E6%A8%A1%E6%80%81%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E6%A8%A1%E5%9E%8B-%E2%80%94-%E5%9B%BE%E5%83%8F-%E6%96%87%E6%9C%AC%E8%B7%A8%E6%A8%A1%E6%80%81%E6%A3%80%E7%B4%A2/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div><div class="search-overlay"><div class="search-container"><div class="search-header"><div class="search-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+搜索</div><div class="search-close-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 0 0 9 -9a9 9 0 0 0 -9 -9a9 9 0 0 0 -9 9a9 9 0 0 0 9 9z" /><path d="M9 8l6 8" /><path d="M15 8l-6 8" /></svg></div></div><div class="search-input-box"><input id="search-input" type="search" placeholder="请输入关键词进行站内搜索……" value="" maxlength="80"/></div><div class="search-result-container"><div class="search-result-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg></div></div></div></div><div id="music-player"></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">Liz Lee</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.3.2" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-06-08T00:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  album: '',
+  codeblock: true,
+  code_copy_text: false,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: true,
+    path: 'search.xml',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+  category: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/plugins/dist/APlayer.min.js"></script>
+<script>const initAplayer = (data) => {
+  if (!data.length) return;
+
+  const ap = new APlayer({
+    container: document.getElementById('music-player'),
+    fixed: true,
+    autoplay: false,
+    theme: '#FFB347',
+    loop: 'all',
+    order: 'list',
+    volume: 0.7,
+    lrcType: 3,
+    audio: data
+  });
+
+  ap.on('play', () => {
+    document.getElementById('music-player').setAttribute("play", "");
+  });
+  ap.on('pause', () => {
+    document.getElementById('music-player').removeAttribute("play");
+  });
+};
+
+const fetchData = () => {
+  fetch('')
+    .then(res => res.json())
+    .then(result => initAplayer(result));
+};
+
+if ('') {
+  document.addEventListener("DOMContentLoaded", fetchData);
+} else {
+  document.addEventListener("DOMContentLoaded", initAplayer());;
+}</script>
+<script src="/js/plugins/dist/search.js"></script>
+
+<script src="/js/main.js" type="module"></script>
+</div></body></html>

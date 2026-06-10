@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Liz Lee"/><meta name="copyright" content="Liz Lee"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="Real-Time,NLP,TypeScript,Azure AI,WebSocket,Microservice,Prisma"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线 | Liz Lee"/><meta name="apple-mobile-web-app-title" content="法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线 | Liz Lee"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://liz-lee-hk.github.io/2026/06/09/project-06-法律场景实时翻译与智能纠错微服务-—-企业级NLP推理流水线/"/><meta name="description" content="项目概述专为法律仲裁场景设计的实时翻译与文本纠错微服务系统。该系统通过WebSocket接收实时转录文本流，应用智能文本替换规则和注音模糊匹配算法进行纠错，再调用Azure AI Translator完成多语翻译，最终通过Azure Web PubSub将结果实时广播至所有监听客户端。 背景与动机法律仲裁（尤其是跨境仲裁）场景下，语音转文字（STT）的转录结果常因法律专业术语、同音词或口音问...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线 | Liz Lee">
+<meta property="og:url" content="https://liz-lee-hk.github.io/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/index.html">
+<meta property="og:site_name" content="Liz Lee">
+<meta property="og:description" content="项目概述专为法律仲裁场景设计的实时翻译与文本纠错微服务系统。该系统通过WebSocket接收实时转录文本流，应用智能文本替换规则和注音模糊匹配算法进行纠错，再调用Azure AI Translator完成多语翻译，最终通过Azure Web PubSub将结果实时广播至所有监听客户端。 背景与动机法律仲裁（尤其是跨境仲裁）场景下，语音转文字（STT）的转录结果常因法律专业术语、同音词或口音问...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liz-lee-hk.github.io/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/assets/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-06-09T22:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-10T08:59:10.970Z">
+<meta property="article:author" content="Liz Lee">
+<meta property="article:tag" content="Azure AI">
+<meta property="article:tag" content="Microservice">
+<meta property="article:tag" content="NLP">
+<meta property="article:tag" content="Prisma">
+<meta property="article:tag" content="Real-Time">
+<meta property="article:tag" content="TypeScript">
+<meta property="article:tag" content="WebSocket">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://liz-lee-hk.github.io/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/assets/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线 | Liz Lee</title><link rel="shortcut icon" href="/assets/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+
+<link rel="stylesheet" href="/css/third-party/dist/APlayer.min.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.2"></head><body bg-style="none"><div class="post-progressbar-container"><div class="post-progressbar"></div></div><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>Liz Lee</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div></div><div id="nav-function"><div id="search-btn"><a href="javascript:void(0);" title="搜索" accesskey="s"><img src="/assets/images/svg/uc/uc-search.svg" class="icon noview" alt="Icon"><span>搜索</span></a></div><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">Liz Lee</a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-aside-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-aside-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-aside-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">Liz Lee</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线</h1><div class="post-author"><span>作者: Liz Lee</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-06-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-06-10</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/Projects/">Projects</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/Azure-AI/" rel="tag">Azure AI</a><a class="post-tags-link" href="/tags/Microservice/" rel="tag">Microservice</a><a class="post-tags-link" href="/tags/NLP/" rel="tag">NLP</a><a class="post-tags-link" href="/tags/Prisma/" rel="tag">Prisma</a><a class="post-tags-link" href="/tags/Real-Time/" rel="tag">Real-Time</a><a class="post-tags-link" href="/tags/TypeScript/" rel="tag">TypeScript</a><a class="post-tags-link" href="/tags/WebSocket/" rel="tag">WebSocket</a></span></div></div></div><div class="post markdown" indent="false"><h2 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h2><p>专为法律仲裁场景设计的实时翻译与文本纠错微服务系统。该系统通过WebSocket接收实时转录文本流，应用智能文本替换规则和注音模糊匹配算法进行纠错，再调用Azure AI Translator完成多语翻译，最终通过Azure Web PubSub将结果实时广播至所有监听客户端。</p>
+<h2 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h2><p>法律仲裁（尤其是跨境仲裁）场景下，语音转文字（STT）的转录结果常因法律专业术语、同音词或口音问题产生错误。传统的做法是由人工维护替换规则表，耗时且覆盖率低。我们需要一个能够自动纠错、实时翻译、并支持多端广播的企业级NLP流水线。</p>
+<h2 id="技术方案"><a href="#技术方案" class="headerlink" title="技术方案"></a>技术方案</h2><h3 id="1-智能文本校正引擎"><a href="#1-智能文本校正引擎" class="headerlink" title="1. 智能文本校正引擎"></a>1. 智能文本校正引擎</h3><ul>
+<li>设计可配置的文本替换规则系统，支持正则匹配、全词匹配、大小写敏感等多种模式</li>
+<li>研发<strong>注音模糊匹配算法</strong>（Fuzzy Pinyin Replacement）：利用拼音相似性自动识别并纠正中文转录中的同音&#x2F;近音错误，通过网络爬虫构建汉字-拼音映射数据库</li>
+</ul>
+<h3 id="2-实时翻译流水线"><a href="#2-实时翻译流水线" class="headerlink" title="2. 实时翻译流水线"></a>2. 实时翻译流水线</h3><ul>
+<li>基于WebSocket的实时流式处理架构：转录文本 → 规则校正 → Azure Translator → 结果广播</li>
+<li>实现Azure Translator多Key负载均衡与故障转移（Failover），单Key限流时自动切换备用Key</li>
+<li>支持自定义领域词典（法律、医疗、技术），提升专业术语翻译准确率</li>
+</ul>
+<h3 id="3-企业级工程实践"><a href="#3-企业级工程实践" class="headerlink" title="3. 企业级工程实践"></a>3. 企业级工程实践</h3><ul>
+<li><strong>ConnectionSession架构</strong>：每个WebSocket连接独立管理生命周期（心跳检测、消息有序性保证、超时自动清理）</li>
+<li><strong>Zod Schema验证</strong>：所有输入输出严格校验，杜绝格式异常导致的运行时错误</li>
+<li><strong>管理控制台</strong>：基于React + TypeScript + Zustand的前端面板，支持规则组、词典、会话的实时管理</li>
+<li><strong>数据库</strong>：MySQL + Prisma ORM，支持复杂的查询与关联</li>
+</ul>
+<h2 id="项目成果"><a href="#项目成果" class="headerlink" title="项目成果"></a>项目成果</h2><ul>
+<li>部署于Azure云，服务于eBRAM在线仲裁平台的实时翻译需求</li>
+<li>注音模糊匹配算法显著降低了法律术语的转录错误率</li>
+<li>多Key轮换机制确保高并发场景下的翻译服务稳定性（可用性 &gt; 99.9%）</li>
+<li>为法律行业STT模型微调提供了错误模式分析与训练数据支撑</li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 Liz Lee 于 2026-06-10 06:00:00 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://liz-lee-hk.github.io/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/">法律场景实时翻译与智能纠错微服务 — 企业级NLP推理流水线</a></span><button class="copy-text" type="button" data-text="https://liz-lee-hk.github.io/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>Liz Lee</a></div><img class="post-copyright-icon noview" src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/Azure-AI/" rel="tag">Azure AI</a><a class="post-tail-tags-link" href="/tags/Microservice/" rel="tag">Microservice</a><a class="post-tail-tags-link" href="/tags/NLP/" rel="tag">NLP</a><a class="post-tail-tags-link" href="/tags/Prisma/" rel="tag">Prisma</a><a class="post-tail-tags-link" href="/tags/Real-Time/" rel="tag">Real-Time</a><a class="post-tail-tags-link" href="/tags/TypeScript/" rel="tag">TypeScript</a><a class="post-tail-tags-link" href="/tags/WebSocket/" rel="tag">WebSocket</a></div><div class="post-nav"><a class="post-nav-prev" href="/2026/06/09/project-07-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94%E7%A0%94%E7%A9%B6-%E2%80%94-%E4%BB%8EBaseline%E5%88%B0Enha/" title="大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化">上一篇<span>大模型代码生成策略对比研究 — 从Baseline到Enhanced Self-Refine的推理优化</span></a><a class="post-nav-next" href="/2026/06/09/project-05-%E5%AE%9E%E6%97%B6%E5%A4%9A%E8%AF%B4%E8%AF%9D%E4%BA%BA%E8%AF%AD%E9%9F%B3%E8%BD%AC%E6%96%87%E5%AD%97%E6%A1%8C%E9%9D%A2%E5%BA%94%E7%94%A8-%E2%80%94-Azure-Cognit/" title="实时多说话人语音转文字桌面应用 — Azure Cognitive Services集成">下一篇<span>实时多说话人语音转文字桌面应用 — Azure Cognitive Services集成</span></a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="toc-list-text">项目概述</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="toc-list-text">背景与动机</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88"><span class="toc-list-text">技术方案</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#1-%E6%99%BA%E8%83%BD%E6%96%87%E6%9C%AC%E6%A0%A1%E6%AD%A3%E5%BC%95%E6%93%8E"><span class="toc-list-text">1. 智能文本校正引擎</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#2-%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="toc-list-text">2. 实时翻译流水线</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#3-%E4%BC%81%E4%B8%9A%E7%BA%A7%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5"><span class="toc-list-text">3. 企业级工程实践</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%88%90%E6%9E%9C"><span class="toc-list-text">项目成果</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://liz-lee-hk.github.io/2026/06/09/project-06-%E6%B3%95%E5%BE%8B%E5%9C%BA%E6%99%AF%E5%AE%9E%E6%97%B6%E7%BF%BB%E8%AF%91%E4%B8%8E%E6%99%BA%E8%83%BD%E7%BA%A0%E9%94%99%E5%BE%AE%E6%9C%8D%E5%8A%A1-%E2%80%94-%E4%BC%81%E4%B8%9A%E7%BA%A7NLP%E6%8E%A8%E7%90%86%E6%B5%81%E6%B0%B4%E7%BA%BF/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div><div class="search-overlay"><div class="search-container"><div class="search-header"><div class="search-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+搜索</div><div class="search-close-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 0 0 9 -9a9 9 0 0 0 -9 -9a9 9 0 0 0 -9 9a9 9 0 0 0 9 9z" /><path d="M9 8l6 8" /><path d="M15 8l-6 8" /></svg></div></div><div class="search-input-box"><input id="search-input" type="search" placeholder="请输入关键词进行站内搜索……" value="" maxlength="80"/></div><div class="search-result-container"><div class="search-result-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg></div></div></div></div><div id="music-player"></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">Liz Lee</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.3.2" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-06-08T00:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  album: '',
+  codeblock: true,
+  code_copy_text: false,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: true,
+    path: 'search.xml',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+  category: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/plugins/dist/APlayer.min.js"></script>
+<script>const initAplayer = (data) => {
+  if (!data.length) return;
+
+  const ap = new APlayer({
+    container: document.getElementById('music-player'),
+    fixed: true,
+    autoplay: false,
+    theme: '#FFB347',
+    loop: 'all',
+    order: 'list',
+    volume: 0.7,
+    lrcType: 3,
+    audio: data
+  });
+
+  ap.on('play', () => {
+    document.getElementById('music-player').setAttribute("play", "");
+  });
+  ap.on('pause', () => {
+    document.getElementById('music-player').removeAttribute("play");
+  });
+};
+
+const fetchData = () => {
+  fetch('')
+    .then(res => res.json())
+    .then(result => initAplayer(result));
+};
+
+if ('') {
+  document.addEventListener("DOMContentLoaded", fetchData);
+} else {
+  document.addEventListener("DOMContentLoaded", initAplayer());;
+}</script>
+<script src="/js/plugins/dist/search.js"></script>
+
+<script src="/js/main.js" type="module"></script>
+</div></body></html>

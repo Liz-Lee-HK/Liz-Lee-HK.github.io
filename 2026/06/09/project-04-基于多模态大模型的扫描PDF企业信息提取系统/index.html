@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Liz Lee"/><meta name="copyright" content="Liz Lee"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="Multimodal LLM,Qwen-VL,OCR,Document AI,Information Extraction,Python"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="基于多模态大模型的扫描PDF企业信息提取系统 | Liz Lee"/><meta name="apple-mobile-web-app-title" content="基于多模态大模型的扫描PDF企业信息提取系统 | Liz Lee"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://liz-lee-hk.github.io/2026/06/09/project-04-基于多模态大模型的扫描PDF企业信息提取系统/"/><meta name="description" content="项目概述一个基于Qwen-VL多模态大模型的智能文档信息提取系统，专门处理香港公司注册处（CR）的扫描PDF文件。系统将PDF页面渲染为高分辨率图像后，利用Qwen-VL的视觉理解能力直接进行OCR识别和结构化字段提取，输出JSON和数据库记录。 背景与动机企业尽职调查和合规审查中，大量公司注册文件以扫描PDF形式存在。传统OCR流水线（版面分析 → 文字检测 → 文字识别 → 结构化提取）...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于多模态大模型的扫描PDF企业信息提取系统 | Liz Lee">
+<meta property="og:url" content="https://liz-lee-hk.github.io/2026/06/09/project-04-%E5%9F%BA%E4%BA%8E%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%89%AB%E6%8F%8FPDF%E4%BC%81%E4%B8%9A%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="Liz Lee">
+<meta property="og:description" content="项目概述一个基于Qwen-VL多模态大模型的智能文档信息提取系统，专门处理香港公司注册处（CR）的扫描PDF文件。系统将PDF页面渲染为高分辨率图像后，利用Qwen-VL的视觉理解能力直接进行OCR识别和结构化字段提取，输出JSON和数据库记录。 背景与动机企业尽职调查和合规审查中，大量公司注册文件以扫描PDF形式存在。传统OCR流水线（版面分析 → 文字检测 → 文字识别 → 结构化提取）...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liz-lee-hk.github.io/2026/06/09/project-04-%E5%9F%BA%E4%BA%8E%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%89%AB%E6%8F%8FPDF%E4%BC%81%E4%B8%9A%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E7%B3%BB%E7%BB%9F/assets/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-06-09T20:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-10T08:59:10.970Z">
+<meta property="article:author" content="Liz Lee">
+<meta property="article:tag" content="Document AI">
+<meta property="article:tag" content="Information Extraction">
+<meta property="article:tag" content="Multimodal LLM">
+<meta property="article:tag" content="OCR">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Qwen-VL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://liz-lee-hk.github.io/2026/06/09/project-04-%E5%9F%BA%E4%BA%8E%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%89%AB%E6%8F%8FPDF%E4%BC%81%E4%B8%9A%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E7%B3%BB%E7%BB%9F/assets/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>基于多模态大模型的扫描PDF企业信息提取系统 | Liz Lee</title><link rel="shortcut icon" href="/assets/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+
+<link rel="stylesheet" href="/css/third-party/dist/APlayer.min.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.2"></head><body bg-style="none"><div class="post-progressbar-container"><div class="post-progressbar"></div></div><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>Liz Lee</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div></div><div id="nav-function"><div id="search-btn"><a href="javascript:void(0);" title="搜索" accesskey="s"><img src="/assets/images/svg/uc/uc-search.svg" class="icon noview" alt="Icon"><span>搜索</span></a></div><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">Liz Lee</a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-aside-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-aside-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-aside-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">Liz Lee</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">基于多模态大模型的扫描PDF企业信息提取系统</h1><div class="post-author"><span>作者: Liz Lee</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-06-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-06-10</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/Projects/">Projects</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/Document-AI/" rel="tag">Document AI</a><a class="post-tags-link" href="/tags/Information-Extraction/" rel="tag">Information Extraction</a><a class="post-tags-link" href="/tags/Multimodal-LLM/" rel="tag">Multimodal LLM</a><a class="post-tags-link" href="/tags/OCR/" rel="tag">OCR</a><a class="post-tags-link" href="/tags/Python/" rel="tag">Python</a><a class="post-tags-link" href="/tags/Qwen-VL/" rel="tag">Qwen-VL</a></span></div></div></div><div class="post markdown" indent="false"><h2 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h2><p>一个基于Qwen-VL多模态大模型的智能文档信息提取系统，专门处理香港公司注册处（CR）的扫描PDF文件。系统将PDF页面渲染为高分辨率图像后，利用Qwen-VL的视觉理解能力直接进行OCR识别和结构化字段提取，输出JSON和数据库记录。</p>
+<h2 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h2><p>企业尽职调查和合规审查中，大量公司注册文件以扫描PDF形式存在。传统OCR流水线（版面分析 → 文字检测 → 文字识别 → 结构化提取）在复杂排版和非标准字体下效果不佳。多模态大模型的出现提供了一种全新范式：将整个页面作为视觉输入，让模型直接「看懂」文档并进行结构化输出。</p>
+<h2 id="技术方案"><a href="#技术方案" class="headerlink" title="技术方案"></a>技术方案</h2><ul>
+<li><strong>PDF渲染</strong>：使用PyMuPDF（fitz）将PDF页面渲染为2倍放大的高分辨率PNG图像，保留细小文字和印章的清晰度</li>
+<li><strong>Qwen-VL多模态推理</strong>：设计结构化Prompt，引导Qwen3-VL-Plus模型从页面图像中提取公司名称、代表人、注册地址、电话、传真、邮箱、业务类型、产品&#x2F;服务等字段</li>
+<li><strong>多线程并发处理</strong>：12个工作线程并发处理PDF页面，显著提升吞吐量</li>
+<li><strong>后处理与清洗</strong>：繁体中文OCR纠错、CJK空格规范化、邮箱去重</li>
+<li><strong>输出双通道</strong>：JSON文件导出 + MySQL数据库插入（upsert逻辑防重复）</li>
+</ul>
+<h2 id="项目成果"><a href="#项目成果" class="headerlink" title="项目成果"></a>项目成果</h2><ul>
+<li>字段提取准确率达85%以上（对比人工标注），远超传统OCR+规则方法的~60%</li>
+<li>12线程并发使处理速度相较于单线程提升约8倍</li>
+<li>成功处理数千份香港公司注册文件的结构化提取</li>
+<li>验证了多模态LLM在企业文档智能化处理中的可行性与效率优势</li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 Liz Lee 于 2026-06-10 04:00:00 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://liz-lee-hk.github.io/2026/06/09/project-04-%E5%9F%BA%E4%BA%8E%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%89%AB%E6%8F%8FPDF%E4%BC%81%E4%B8%9A%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E7%B3%BB%E7%BB%9F/">基于多模态大模型的扫描PDF企业信息提取系统</a></span><button class="copy-text" type="button" data-text="https://liz-lee-hk.github.io/2026/06/09/project-04-%E5%9F%BA%E4%BA%8E%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%89%AB%E6%8F%8FPDF%E4%BC%81%E4%B8%9A%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E7%B3%BB%E7%BB%9F/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>Liz Lee</a></div><img class="post-copyright-icon noview" src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/Document-AI/" rel="tag">Document AI</a><a class="post-tail-tags-link" href="/tags/Information-Extraction/" rel="tag">Information Extraction</a><a class="post-tail-tags-link" href="/tags/Multimodal-LLM/" rel="tag">Multimodal LLM</a><a class="post-tail-tags-link" href="/tags/OCR/" rel="tag">OCR</a><a class="post-tail-tags-link" href="/tags/Python/" rel="tag">Python</a><a class="post-tail-tags-link" href="/tags/Qwen-VL/" rel="tag">Qwen-VL</a></div><div class="post-nav"><a class="post-nav-prev" href="/2026/06/09/project-05-%E5%AE%9E%E6%97%B6%E5%A4%9A%E8%AF%B4%E8%AF%9D%E4%BA%BA%E8%AF%AD%E9%9F%B3%E8%BD%AC%E6%96%87%E5%AD%97%E6%A1%8C%E9%9D%A2%E5%BA%94%E7%94%A8-%E2%80%94-Azure-Cognit/" title="实时多说话人语音转文字桌面应用 — Azure Cognitive Services集成">上一篇<span>实时多说话人语音转文字桌面应用 — Azure Cognitive Services集成</span></a><a class="post-nav-next" href="/2026/06/09/project-03-%E8%BE%B9%E5%9D%A1%E5%8D%AB%E5%A3%AB-%E2%80%94-%E5%9F%BA%E4%BA%8E%E5%8D%AB%E6%98%9F%E9%81%A5%E6%84%9F%E4%B8%8E%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%9C%B0%E8%B4%A8%E7%81%BE%E5%AE%B3%E6%99%BA%E8%83%BD%E7%9B%91%E6%B5%8B%E5%B9%B3%E5%8F%B0/" title="边坡卫士 — 基于卫星遥感与机器学习的地质灾害智能监测平台">下一篇<span>边坡卫士 — 基于卫星遥感与机器学习的地质灾害智能监测平台</span></a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%A6%82%E8%BF%B0"><span class="toc-list-text">项目概述</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="toc-list-text">背景与动机</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88"><span class="toc-list-text">技术方案</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%A1%B9%E7%9B%AE%E6%88%90%E6%9E%9C"><span class="toc-list-text">项目成果</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://liz-lee-hk.github.io/2026/06/09/project-04-%E5%9F%BA%E4%BA%8E%E5%A4%9A%E6%A8%A1%E6%80%81%E5%A4%A7%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%89%AB%E6%8F%8FPDF%E4%BC%81%E4%B8%9A%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E7%B3%BB%E7%BB%9F/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div><div class="search-overlay"><div class="search-container"><div class="search-header"><div class="search-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+搜索</div><div class="search-close-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 0 0 9 -9a9 9 0 0 0 -9 -9a9 9 0 0 0 -9 9a9 9 0 0 0 9 9z" /><path d="M9 8l6 8" /><path d="M15 8l-6 8" /></svg></div></div><div class="search-input-box"><input id="search-input" type="search" placeholder="请输入关键词进行站内搜索……" value="" maxlength="80"/></div><div class="search-result-container"><div class="search-result-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg></div></div></div></div><div id="music-player"></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">Liz Lee</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.3.2" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-06-08T00:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  album: '',
+  codeblock: true,
+  code_copy_text: false,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: true,
+    path: 'search.xml',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+  category: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/plugins/dist/APlayer.min.js"></script>
+<script>const initAplayer = (data) => {
+  if (!data.length) return;
+
+  const ap = new APlayer({
+    container: document.getElementById('music-player'),
+    fixed: true,
+    autoplay: false,
+    theme: '#FFB347',
+    loop: 'all',
+    order: 'list',
+    volume: 0.7,
+    lrcType: 3,
+    audio: data
+  });
+
+  ap.on('play', () => {
+    document.getElementById('music-player').setAttribute("play", "");
+  });
+  ap.on('pause', () => {
+    document.getElementById('music-player').removeAttribute("play");
+  });
+};
+
+const fetchData = () => {
+  fetch('')
+    .then(res => res.json())
+    .then(result => initAplayer(result));
+};
+
+if ('') {
+  document.addEventListener("DOMContentLoaded", fetchData);
+} else {
+  document.addEventListener("DOMContentLoaded", initAplayer());;
+}</script>
+<script src="/js/plugins/dist/search.js"></script>
+
+<script src="/js/main.js" type="module"></script>
+</div></body></html>

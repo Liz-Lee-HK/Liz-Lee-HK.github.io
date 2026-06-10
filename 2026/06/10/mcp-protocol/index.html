@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="author" content="Liz Lee"/><meta name="copyright" content="Liz Lee"/><meta name="theme-color" content="#FFB347"/><meta name="format-detection" content="telephone=no"/><meta name="keywords" content="Agent,MCP,协议,LLM,Anthropic,工具调用"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-touch-fullscreen" content="yes"/><meta name="application-name" content="MCP（Model Context Protocol）模型上下文协议详解 | Liz Lee"/><meta name="apple-mobile-web-app-title" content="MCP（Model Context Protocol）模型上下文协议详解 | Liz Lee"/><meta name="apple-mobile-web-app-status-bar-style" content="#FFB347"/><link rel="canonical" href="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/"/><meta name="description" content="什么是 MCP？MCP（Model Context Protocol） 是 Anthropic 于 2024 年底开源的一套标准化协议，旨在统一大语言模型与外部工具、数据源之间的交互方式。它被业界通俗地比喻为「AI 界的 USB-C」——简单来说就是一套AI与工具之间对话的语法。 在 MCP 出现之前，每个 LLM 应用都需要为不同的数据源和工具编写定制化的连接代码，形成 M×N （M是模型...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MCP（Model Context Protocol）模型上下文协议详解 | Liz Lee">
+<meta property="og:url" content="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/index.html">
+<meta property="og:site_name" content="Liz Lee">
+<meta property="og:description" content="什么是 MCP？MCP（Model Context Protocol） 是 Anthropic 于 2024 年底开源的一套标准化协议，旨在统一大语言模型与外部工具、数据源之间的交互方式。它被业界通俗地比喻为「AI 界的 USB-C」——简单来说就是一套AI与工具之间对话的语法。 在 MCP 出现之前，每个 LLM 应用都需要为不同的数据源和工具编写定制化的连接代码，形成 M×N （M是模型...">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/assets/images/Hexo-Theme-MEOW.png">
+<meta property="article:published_time" content="2026-06-10T07:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-10T08:59:10.970Z">
+<meta property="article:author" content="Liz Lee">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="Anthropic">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="MCP">
+<meta property="article:tag" content="协议">
+<meta property="article:tag" content="工具调用">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/assets/images/Hexo-Theme-MEOW.png"><meta name="robots" content="index,follow"/><meta name="googlebot" content="index,follow"/><meta name="revisit-after" content="1 days"/><title>MCP（Model Context Protocol）模型上下文协议详解 | Liz Lee</title><link rel="shortcut icon" href="/assets/images/Hexo-Theme-MEOW.ico"><link rel="preconnect" href="/assets"/><link rel="preconnect" href="assets"/>
+<link rel="stylesheet" href="/css/style.css">
+
+<link rel="stylesheet" href="/css/third-party/dist/APlayer.min.css">
+<link rel="prefetch" href="/"/><link rel="prefetch" href="/archives"/><link rel="prefetch" href="/tags"/><meta name="generator" content="Hexo 8.1.2"></head><body bg-style="none"><div class="post-progressbar-container"><div class="post-progressbar"></div></div><header><div id="navbar"><div id="nav-info"><a id="site-icon" href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a id="site-name" href="/" title="主页"><div>Liz Lee</div><img src="/assets/images/svg/uc/uc-home.svg" class="icon noview" alt="Icon"></a></div><div id="nav-menu"><div class="menu-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div></div><div id="nav-function"><div id="search-btn"><a href="javascript:void(0);" title="搜索" accesskey="s"><img src="/assets/images/svg/uc/uc-search.svg" class="icon noview" alt="Icon"><span>搜索</span></a></div><div id="menu-btn"><a href="javascript:void(0);" title="打开菜单"><img src="/assets/images/svg/uc/uc-menu.svg" class="icon noview" alt="Icon"></a></div></div></div></header><div id="menu-aside"><div id="menu-aside-container"><div id="menu-aside-info"><a href="/" title="主页"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></a><a href="/" title="主页">Liz Lee</a></div><div class="menu-aside-item"><a href="/about"><img src="/assets/images/svg/uc/uc-about.svg" class="icon noview" alt="Icon"><span>关于</span></a></div><div class="menu-aside-item"><a href="/categories/Projects/"><img src="/assets/images/svg/uc/uc-category.svg" class="icon noview" alt="Icon"><span>项目集</span></a></div><div class="menu-aside-item"><a href="/categories/Notes/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>随手记</span></a></div><div class="menu-aside-item"><a href="/categories/Study/"><img src="/assets/images/svg/uc/uc-article.svg" class="icon noview" alt="Icon"><span>学习笔记</span></a></div><div class="menu-aside-item"><a href="/archives"><img src="/assets/images/svg/uc/uc-archive.svg" class="icon noview" alt="Icon"><span>归档</span></a></div><hr/></div></div><main><div class="banner"><div class="banner-info"><div class="banner-avatar"><img src="/assets/images/Hexo-Theme-MEOW.png" alt="Avatar"/></div><div class="banner-title">Liz Lee</div></div></div><div class="post-container"><div class="post-main"><div class="post-content"><h1 class="post-title">MCP（Model Context Protocol）模型上下文协议详解</h1><div class="post-author"><span>作者: Liz Lee</span></div><div class="post-meta"><div class="post-info"><div class="post-date"><div class="post-pubdate"><img src="/assets/images/svg/ta/ta-pubdate.svg" class="icon noview" alt="Icon"><span>发表于2026-06-10</span></div><div class="post-update"><img src="/assets/images/svg/ta/ta-update.svg" class="icon noview" alt="Icon"><span>更新于2026-06-10</span></div></div><div class="post-read"></div></div><div class="post-attribute"><div class="post-categories"><img src="/assets/images/svg/ta/ta-category.svg" class="icon noview" alt="Icon"><span><a class="post-categories-link" href="/categories/Study/">Study</a></span></div><div class="post-tags"><img src="/assets/images/svg/ta/ta-tag.svg" class="icon noview" alt="Icon"><span><a class="post-tags-link" href="/tags/Agent/" rel="tag">Agent</a><a class="post-tags-link" href="/tags/Anthropic/" rel="tag">Anthropic</a><a class="post-tags-link" href="/tags/LLM/" rel="tag">LLM</a><a class="post-tags-link" href="/tags/MCP/" rel="tag">MCP</a><a class="post-tags-link" href="/tags/%E5%8D%8F%E8%AE%AE/" rel="tag">协议</a><a class="post-tags-link" href="/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/" rel="tag">工具调用</a></span></div></div></div><div class="post markdown" indent="false"><h2 id="什么是-MCP？"><a href="#什么是-MCP？" class="headerlink" title="什么是 MCP？"></a>什么是 MCP？</h2><p><strong>MCP（Model Context Protocol）</strong> 是 Anthropic 于 2024 年底开源的一套标准化协议，旨在统一大语言模型与外部工具、数据源之间的交互方式。它被业界通俗地比喻为「AI 界的 USB-C」——简单来说就是一套AI与工具之间对话的语法。</p>
+<p>在 MCP 出现之前，每个 LLM 应用都需要为不同的数据源和工具编写定制化的连接代码，形成 M×N （M是模型数，N是工具数）的集成矩阵。MCP 将其简化为 M+N 的架构：模型只需实现 MCP 客户端（模型的总和为客户端，M个模型做M个适配），工具只需实现 MCP 服务端（工具的总和为服务端，N个工具做N个适配），双方通过统一协议通信。</p>
+<h2 id="为什么需要-MCP？"><a href="#为什么需要-MCP？" class="headerlink" title="为什么需要 MCP？"></a>为什么需要 MCP？</h2><h3 id="一句话说明MCP的作用"><a href="#一句话说明MCP的作用" class="headerlink" title="一句话说明MCP的作用"></a>一句话说明MCP的作用</h3><p>可以让你的AI能调用外部工具&#x2F;数据，真正做实事而不是单纯思考，让AI长出手。（帮你做日程规划，CC能帮你用figma生成webApp）</p>
+<h3 id="MCP-之前的困境"><a href="#MCP-之前的困境" class="headerlink" title="MCP 之前的困境"></a>MCP 之前的困境</h3><p>传统的 LLM 工具调用（Function Calling）存在几个核心问题：</p>
+<ol>
+<li><strong>碎片化</strong>：各家大模型没有一套统一的Function Calling 格式</li>
+<li><strong>缺乏发现机制</strong>：开发者必须在代码里手动写死有哪些工具、接口地址、调用方式，模型运行时不知道环境里还有哪些可用工具。没有通用的「工具注册→查询→发现」流程，工具新增 &#x2F; 下线都要改代码，模型无法动态感知。</li>
+<li><strong>无标准化的资源访问</strong>：访问各类资源没有统一接口范式。<br>。想要让模型读取文件、数据库、API，每种数据源需要单独集成</li>
+<li><strong>缺乏权限与安全模型</strong>：各家 LLM 协议都没定义：身份校验、调用权限、访问范围、操作审计、沙箱隔离等通用安全规则。权限控制、防越权、调用限流、日志审计全都要开发者从零手写，实现参差不齐，也容易出现安全漏洞。</li>
+</ol>
+<h3 id="MCP-的核心价值"><a href="#MCP-的核心价值" class="headerlink" title="MCP 的核心价值"></a>MCP 的核心价值</h3><div class="table-container"><table>
+<thead>
+<tr>
+<th>痛点</th>
+<th>MCP 解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>多模型适配</td>
+<td>统一的 JSON-RPC 协议，与具体模型解耦</td>
+</tr>
+<tr>
+<td>工具发现</td>
+<td>服务端主动暴露工具列表（<code>tools/list</code>），客户端动态获取</td>
+</tr>
+<tr>
+<td>资源访问</td>
+<td>标准化的 Resources 抽象，统一文件、数据库、API 的读取方式</td>
+</tr>
+<tr>
+<td>安全控制</td>
+<td>传输层支持 OAuth 2.0、API Key 等认证机制</td>
+</tr>
+<tr>
+<td>生态复用</td>
+<td>社区共享的 MCP Server，一次构建、到处使用</td>
+</tr>
+</tbody></table></div>
+<h2 id="MCP-架构"><a href="#MCP-架构" class="headerlink" title="MCP 架构"></a>MCP 架构</h2><p>MCP 的整体架构可以表示为以下层级关系：</p>
+<div class="code-container" code-lang="Plaintext"><div class="codebox"><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">Model Context Protocol (MCP) Architecture</span><br><span class="line">├── 基础协议层</span><br><span class="line">│   ├── 底层协议：JSON-RPC 2.0</span><br><span class="line">│   ├── 会话模型：有状态持久会话</span><br><span class="line">│   └── 核心目标：上下文交换 + 采样协调</span><br><span class="line">│</span><br><span class="line">├── 三大核心组件</span><br><span class="line">│   ├── 1. MCP Host（主机）</span><br><span class="line">│   │   ├── 角色：容器/调度中心</span><br><span class="line">│   │   ├── 例子：Claude Desktop、VS Code、Cursor</span><br><span class="line">│   │   └── 职责：管理客户端、控制权限、协调AI模型</span><br><span class="line">│   │</span><br><span class="line">│   ├── 2. MCP Client（客户端）</span><br><span class="line">│   │   ├── 角色：通信实例（1:1连接Server）</span><br><span class="line">│   │   ├── 运行位置：Host内部</span><br><span class="line">│   │   └── 职责：收发请求、传递上下文、中转数据</span><br><span class="line">│   │</span><br><span class="line">│   └── 3. MCP Server（服务端）</span><br><span class="line">│       ├── 角色：能力提供者</span><br><span class="line">│       ├── 运行位置：独立进程/服务</span><br><span class="line">│       └── 职责：暴露资源、提供工具、权限验证</span><br><span class="line">│</span><br><span class="line">├── 核心能力模型</span><br><span class="line">│   ├── Resources：可读取的数据（文件、数据库、API）</span><br><span class="line">│   ├── Tools：可执行的操作（查询、脚本、函数调用）</span><br><span class="line">│   ├── Prompts：可复用的提示词模板</span><br><span class="line">│   └── Sampling：客户端向模型发起生成请求</span><br><span class="line">│</span><br><span class="line">└── 关键特性</span><br><span class="line">    ├── 清晰的安全边界（Host控制权限）</span><br><span class="line">    ├── 解耦的架构（Host/Client/Server职责分离）</span><br><span class="line">    ├── 统一的通信标准（解决M×N碎片化问题）</span><br><span class="line">    └── 支持复杂多步骤AI工作流</span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<h3 id="三大核心组件详解"><a href="#三大核心组件详解" class="headerlink" title="三大核心组件详解"></a>三大核心组件详解</h3><h4 id="1-MCP-Host（主机）"><a href="#1-MCP-Host（主机）" class="headerlink" title="1. MCP Host（主机）"></a>1. MCP Host（主机）</h4><p>Host 是用户直接交互的AI应用，如 Claude Desktop、VS Code + Cursor。它是整个 MCP 系统的容器与调度中心，内部管理一个或多个 MCP Client 实例，负责权限控制（决定 Client 能连哪些 Server）、UI 渲染和 AI 模型的协调调度。</p>
+<h4 id="2-MCP-Client（客户端）"><a href="#2-MCP-Client（客户端）" class="headerlink" title="2. MCP Client（客户端）"></a>2. MCP Client（客户端）</h4><p>Client 是 Host 内部的通信实例，与 Server 保持 <strong>1:1 连接</strong>。它不直接面向用户，而是作为 Host 与 Server 之间的消息中转站——收发 JSON-RPC 请求、传递上下文数据、中转工具调用结果。每个 Client 连接到特定的一个 Server。</p>
+<h4 id="3-MCP-Server（服务端）"><a href="#3-MCP-Server（服务端）" class="headerlink" title="3. MCP Server（服务端）"></a>3. MCP Server（服务端）</h4><p>Server 是能力的实际提供者，运行在独立进程或远程服务中。它暴露 Resources（数据）、Tools（操作）和 Prompts（模板），并负责权限验证。社区中已有数百个开箱即用的 MCP Server，覆盖文件系统、数据库、搜索引擎、云服务等场景。</p>
+<h3 id="MCP通信过程举例"><a href="#MCP通信过程举例" class="headerlink" title="MCP通信过程举例"></a>MCP通信过程举例</h3><p>一个典型的 MCP 调用流程是这样的：<br>用户 → Host：在 Claude Desktop 里输入 “帮我读取我的 Notion 笔记并做个摘要”。<br>Host → Client：创建一个 MCP 客户端实例，连接到 Notion MCP Server。<br>Client → Server：发送请求，“请给我用户授权的 Notion 笔记内容”。<br>Server → Client：验证权限后，返回笔记的结构化数据。<br>Client → Host&#x2F;AI 模型：把数据传给 Claude 模型。<br>AI 模型生成摘要 → Host → 用户：把摘要结果返回给用户，同时可以再通过客户端调用其他服务端工具（比如把摘要保存到文件）。</p>
+<h3 id="核心能力模型"><a href="#核心能力模型" class="headerlink" title="核心能力模型"></a>核心能力模型</h3><p>MCP 为 Server 定义了四种可供暴露的能力：</p>
+<h4 id="Resources（资源）"><a href="#Resources（资源）" class="headerlink" title="Resources（资源）"></a>Resources（资源）</h4><p>模型可以<strong>读取</strong>的上下文数据。类似 REST API 的 GET 端点。</p>
+<div class="code-container" code-lang="Plaintext"><div class="codebox"><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 客户端请求资源列表</span><br><span class="line">&#123; &quot;method&quot;: &quot;resources/list&quot; &#125;</span><br><span class="line"></span><br><span class="line">// 服务端返回</span><br><span class="line">&#123; &quot;resources&quot;: [</span><br><span class="line">    &#123; &quot;uri&quot;: &quot;file:///docs/report.pdf&quot;, &quot;name&quot;: &quot;年报&quot; &#125;,</span><br><span class="line">    &#123; &quot;uri&quot;: &quot;postgres://db/sales&quot;, &quot;name&quot;: &quot;销售数据库&quot; &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<h4 id="Tools（工具）"><a href="#Tools（工具）" class="headerlink" title="Tools（工具）"></a>Tools（工具）</h4><p>模型可以<strong>执行</strong>的操作。类似 REST API 的 POST 端点，带有结构化的输入输出定义。</p>
+<div class="code-container" code-lang="Json"><div class="codebox"><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;search_web&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;搜索互联网获取最新信息&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;inputSchema&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;搜索关键词&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;query&quot;</span><span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<h4 id="Prompts（提示模板）"><a href="#Prompts（提示模板）" class="headerlink" title="Prompts（提示模板）"></a>Prompts（提示模板）</h4><p>预定义的 Prompt 模板，方便用户快速发起特定类型的对话。</p>
+<h4 id="Sampling（采样）"><a href="#Sampling（采样）" class="headerlink" title="Sampling（采样）"></a>Sampling（采样）</h4><p>与前三者方向相反——Sampling 允许 Server 反向请求 Client 调用 LLM 完成生成任务。设计上也便于 Human-in-the-loop 审批流。</p>
+<h3 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h3><p>MCP 支持两种传输方式：</p>
+<ul>
+<li><strong>Stdio（标准输入输出）</strong>：本地进程通信，延迟最低，适用于本地工具</li>
+<li><strong>HTTP + SSE（Server-Sent Events）</strong>：远程通信，适用于云端服务和分布式部署</li>
+</ul>
+<h2 id="MCP-vs-其他协议对比"><a href="#MCP-vs-其他协议对比" class="headerlink" title="MCP vs. 其他协议对比"></a>MCP vs. 其他协议对比</h2><h3 id="MCP-vs-Function-Calling"><a href="#MCP-vs-Function-Calling" class="headerlink" title="MCP vs. Function Calling"></a>MCP vs. Function Calling</h3><div class="table-container"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Function Calling</th>
+<th>MCP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定义方式</td>
+<td>模型特定（OpenAI&#x2F;Anthropic 格式各异）</td>
+<td>统一 JSON Schema</td>
+</tr>
+<tr>
+<td>工具发现</td>
+<td>硬编码开发商定</td>
+<td>动态发现 <code>tools/list</code></td>
+</tr>
+<tr>
+<td>资源抽象</td>
+<td>无，每次需手动处理上下文</td>
+<td>Resources 原语统一抽象</td>
+</tr>
+<tr>
+<td>生态</td>
+<td>各自为战</td>
+<td>社区共建，开源 Server 库</td>
+</tr>
+<tr>
+<td>模型耦合</td>
+<td>强耦合</td>
+<td>松耦合</td>
+</tr>
+</tbody></table></div>
+<h3 id="MCP-vs-A2A（Agent-to-Agent）"><a href="#MCP-vs-A2A（Agent-to-Agent）" class="headerlink" title="MCP vs. A2A（Agent-to-Agent）"></a>MCP vs. A2A（Agent-to-Agent）</h3><p>Google 提出的 <strong>A2A（Agent-to-Agent Protocol）</strong> 常与 MCP 对比：</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>MCP</th>
+<th>A2A</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>模型 ↔ 工具&#x2F;数据的连接</td>
+<td>Agent ↔ Agent 的协作</td>
+</tr>
+<tr>
+<td>提出方</td>
+<td>Anthropic</td>
+<td>Google</td>
+</tr>
+<tr>
+<td>核心场景</td>
+<td>单 Agent 使用外部能力</td>
+<td>多 Agent 之间的任务委派</td>
+</tr>
+<tr>
+<td>关系</td>
+<td>互补，非竞争</td>
+<td>互补，非竞争</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>简单理解：MCP 是 Agent 的「手和眼」，让 Agent 能操作外部世界；A2A 是 Agent 的「嘴和耳」，让 Agent 之间能沟通协作。</p>
+</blockquote>
+<h2 id="实战：MCP-Server-开发示例"><a href="#实战：MCP-Server-开发示例" class="headerlink" title="实战：MCP Server 开发示例"></a>实战：MCP Server 开发示例</h2><p>以下是一个最小化的 Python MCP Server，暴露一个计算器工具：</p>
+<div class="code-container" code-lang="Python"><div class="codebox"><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mcp.server <span class="keyword">import</span> Server, NotificationOptions</span><br><span class="line"><span class="keyword">from</span> mcp.server.models <span class="keyword">import</span> InitializationCapabilities</span><br><span class="line"><span class="keyword">import</span> mcp.types <span class="keyword">as</span> types</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建 MCP Server</span></span><br><span class="line">server = Server(<span class="string">&quot;calculator-server&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@server.list_tools()</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">handle_list_tools</span>() -&gt; <span class="built_in">list</span>[types.Tool]:</span><br><span class="line">    <span class="keyword">return</span> [</span><br><span class="line">        types.Tool(</span><br><span class="line">            name=<span class="string">&quot;calculate&quot;</span>,</span><br><span class="line">            description=<span class="string">&quot;执行数学表达式计算&quot;</span>,</span><br><span class="line">            inputSchema=&#123;</span><br><span class="line">                <span class="string">&quot;type&quot;</span>: <span class="string">&quot;object&quot;</span>,</span><br><span class="line">                <span class="string">&quot;properties&quot;</span>: &#123;</span><br><span class="line">                    <span class="string">&quot;expression&quot;</span>: &#123;</span><br><span class="line">                        <span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;description&quot;</span>: <span class="string">&quot;数学表达式，如 &#x27;2 + 3 * 4&#x27;&quot;</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="string">&quot;required&quot;</span>: [<span class="string">&quot;expression&quot;</span>]</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line"><span class="meta">@server.call_tool()</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">handle_call_tool</span>(<span class="params"></span></span><br><span class="line"><span class="params">    name: <span class="built_in">str</span>, arguments: <span class="built_in">dict</span></span></span><br><span class="line"><span class="params"></span>) -&gt; <span class="built_in">list</span>[types.TextContent]:</span><br><span class="line">    <span class="keyword">if</span> name == <span class="string">&quot;calculate&quot;</span>:</span><br><span class="line">        result = <span class="built_in">eval</span>(arguments[<span class="string">&quot;expression&quot;</span>])</span><br><span class="line">        <span class="keyword">return</span> [types.TextContent(<span class="built_in">type</span>=<span class="string">&quot;text&quot;</span>, text=<span class="built_in">str</span>(result))]</span><br><span class="line">    <span class="keyword">raise</span> ValueError(<span class="string">f&quot;Unknown tool: <span class="subst">&#123;name&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> mcp.server.stdio.stdio_server() <span class="keyword">as</span> (read_stream, write_stream):</span><br><span class="line">        <span class="keyword">await</span> server.run(</span><br><span class="line">            read_stream,</span><br><span class="line">            write_stream,</span><br><span class="line">            InitializationCapabilities(</span><br><span class="line">                sampling=&#123;&#125;,</span><br><span class="line">                experimental=&#123;&#125;,</span><br><span class="line">                roots=&#123;&#125;</span><br><span class="line">            ),</span><br><span class="line">            notification_options=NotificationOptions()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="keyword">import</span> asyncio</span><br><span class="line">    asyncio.run(main())</span><br></pre></td></tr></table></figure><div class="code-fold" title="Fold/Open"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg></div><div class="code-copy" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"  stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" /><path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></div></div></div>
+
+<h2 id="MCP-生态现状"><a href="#MCP-生态现状" class="headerlink" title="MCP 生态现状"></a>MCP 生态现状</h2><p>截至 2026 年中，MCP 生态已相当成熟：</p>
+<ul>
+<li><strong>官方 SDK</strong>：Python、TypeScript、Java、Kotlin 均已支持</li>
+<li><strong>社区 Server</strong>：数百个开源 MCP Server，覆盖数据库（PostgreSQL、SQLite）、文件系统、搜索引擎（Brave、Exa）、项目管理（GitHub、Jira）、云服务（AWS、GCP）等</li>
+<li><strong>框架集成</strong>：LangChain、LlamaIndex、CrewAI 等主流 Agent 框架均已支持 MCP</li>
+<li><strong>模型支持</strong>：Claude Desktop、Cursor、Continue 等 AI 应用原生支持 MCP</li>
+</ul>
+<h2 id="面试要点"><a href="#面试要点" class="headerlink" title="面试要点"></a>面试要点</h2><ol>
+<li><strong>一句话定义</strong>：MCP 是 Anthropic 提出的开源标准协议，统一 LLM 与外部工具&#x2F;数据的交互方式</li>
+<li><strong>三大组件 + 四大能力</strong>：Host（调度中心）&#x2F; Client（通信实例）&#x2F; Server（能力提供）；Resources（读数据）、Tools（执行操作）、Prompts（模板）、Sampling（反向生成请求）</li>
+<li><strong>与 Function Calling 的核心区别</strong>：MCP 是模型无关的协议层抽象，Function Calling 是具体模型的 API 格式</li>
+<li><strong>与 A2A 的区别</strong>：MCP 连接工具和数据（外部能力），A2A 连接 Agent（多智能体协作），两者互补</li>
+<li><strong>传输方式</strong>：Stdio（本地低延迟）+ HTTP&#x2F;SSE（远程分布式）</li>
+</ol>
+<h2 id="参考资源"><a href="#参考资源" class="headerlink" title="参考资源"></a>参考资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://modelcontextprotocol.io/">MCP 官方规范</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/modelcontextprotocol">MCP GitHub 仓库</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anthropic.com/news/model-context-protocol">Anthropic MCP 介绍博客</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/modelcontextprotocol/python-sdk">MCP Python SDK</a></li>
+</ul>
+</div><div class="post-reward"><div class="post-reward-btn" title="赞赏作者"><img src="/assets/images/svg/uc/uc-gift.svg" class="icon noview" alt="Icon"><span></span></div><div class="post-reward-content"><div class="post-reward-text"></div></div></div><div class="post-copyright"><div class="post-copyright-info">本作品由 Liz Lee 于 2026-06-10 15:00:00 发布</div><div class="post-copyright-link"><span>作品地址：<a href="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/">MCP（Model Context Protocol）模型上下文协议详解</a></span><button class="copy-text" type="button" data-text="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/">复制</button></div><div class="post-copyright-detail">除特别声明外，本站作品均采用 <a href='https://creativecommons.org/licenses/by-nc-sa/4.0/' title='Attribution-NonCommercial-ShareAlike' target='_blank'>CC BY-NC-SA 4.0</a> 许可协议，转载请注明来自 <a href='/'>Liz Lee</a></div><img class="post-copyright-icon noview" src="/assets/images/Hexo-Theme-MEOW.png" alt="Logo"/></div><div class="post-tail-tags"><a class="post-tail-tags-link" href="/tags/Agent/" rel="tag">Agent</a><a class="post-tail-tags-link" href="/tags/Anthropic/" rel="tag">Anthropic</a><a class="post-tail-tags-link" href="/tags/LLM/" rel="tag">LLM</a><a class="post-tail-tags-link" href="/tags/MCP/" rel="tag">MCP</a><a class="post-tail-tags-link" href="/tags/%E5%8D%8F%E8%AE%AE/" rel="tag">协议</a><a class="post-tail-tags-link" href="/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/" rel="tag">工具调用</a></div><div class="post-nav"><a class="post-nav-prev" href="/2026/06/10/mcp-file-transfer-research/" title="MCP 文件传输方案调研 — Base64 vs. 文件中转服务">上一篇<span>MCP 文件传输方案调研 — Base64 vs. 文件中转服务</span></a><a class="post-nav-next" href="/2026/06/10/project-09-%E6%99%BA%E8%83%BD%E6%B1%82%E8%81%8C%E5%8A%A9%E6%89%8B-%E2%80%94-%E5%9F%BA%E4%BA%8EQwen2.5-7B-LoRA%E5%BE%AE%E8%B0%83%E4%B8%8E%E6%B7%B7/" title="智能求职助手 — 基于Qwen2.5-7B LoRA微调与混合推理架构的AI面试Agent">下一篇<span>智能求职助手 — 基于Qwen2.5-7B LoRA微调与混合推理架构的AI面试Agent</span></a></div></div><aside id="post-sidebar" status="show"><div id="toc-container"><div class="toc-title"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"><span>目录</span></div><div class="toc-content" id="toc-div"><ol class="toc-list"><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-MCP%EF%BC%9F"><span class="toc-list-text">什么是 MCP？</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-MCP%EF%BC%9F"><span class="toc-list-text">为什么需要 MCP？</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E8%AF%B4%E6%98%8EMCP%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-list-text">一句话说明MCP的作用</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#MCP-%E4%B9%8B%E5%89%8D%E7%9A%84%E5%9B%B0%E5%A2%83"><span class="toc-list-text">MCP 之前的困境</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#MCP-%E7%9A%84%E6%A0%B8%E5%BF%83%E4%BB%B7%E5%80%BC"><span class="toc-list-text">MCP 的核心价值</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#MCP-%E6%9E%B6%E6%9E%84"><span class="toc-list-text">MCP 架构</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E4%B8%89%E5%A4%A7%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6%E8%AF%A6%E8%A7%A3"><span class="toc-list-text">三大核心组件详解</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#MCP%E9%80%9A%E4%BF%A1%E8%BF%87%E7%A8%8B%E4%B8%BE%E4%BE%8B"><span class="toc-list-text">MCP通信过程举例</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E6%A0%B8%E5%BF%83%E8%83%BD%E5%8A%9B%E6%A8%A1%E5%9E%8B"><span class="toc-list-text">核心能力模型</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#%E4%BC%A0%E8%BE%93%E5%B1%82"><span class="toc-list-text">传输层</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#MCP-vs-%E5%85%B6%E4%BB%96%E5%8D%8F%E8%AE%AE%E5%AF%B9%E6%AF%94"><span class="toc-list-text">MCP vs. 其他协议对比</span></a><ol class="toc-list-child"><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#MCP-vs-Function-Calling"><span class="toc-list-text">MCP vs. Function Calling</span></a></li><li class="toc-list-item toc-list-level-3"><a class="toc-list-link" href="#MCP-vs-A2A%EF%BC%88Agent-to-Agent%EF%BC%89"><span class="toc-list-text">MCP vs. A2A（Agent-to-Agent）</span></a></li></ol></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E5%AE%9E%E6%88%98%EF%BC%9AMCP-Server-%E5%BC%80%E5%8F%91%E7%A4%BA%E4%BE%8B"><span class="toc-list-text">实战：MCP Server 开发示例</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#MCP-%E7%94%9F%E6%80%81%E7%8E%B0%E7%8A%B6"><span class="toc-list-text">MCP 生态现状</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E9%9D%A2%E8%AF%95%E8%A6%81%E7%82%B9"><span class="toc-list-text">面试要点</span></a></li><li class="toc-list-item toc-list-level-2"><a class="toc-list-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%BA%90"><span class="toc-list-text">参考资源</span></a></li></ol></div></div></aside></div></div><div id="toolbar" hide=""><div id="toolbar-setting-container" hide=""><div class="toolbar-item"><button id="tool-color-mode" title="深色模式" type="button"><img src="/assets/images/svg/ta/ta-moon.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button class="copy-text" id="tool-share" title="分享" type="button" data-text="https://liz-lee-hk.github.io/2026/06/10/mcp-protocol/"><img src="/assets/images/svg/ta/ta-share.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-plus" title="放大字体" type="button"><img src="/assets/images/svg/ta/ta-text-plus.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-font-size-minus" title="缩小字体" type="button"><img src="/assets/images/svg/ta/ta-text-minus.svg" class="icon noview" alt="Icon"></button></div></div><div class="toolbar-container"><div class="toolbar-item"><button id="tool-setting" title="设置" type="button"><img src="/assets/images/svg/ta/ta-setting.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-toc" title="目录" type="button"><img src="/assets/images/svg/ta/ta-toc.svg" class="icon noview" alt="Icon"></button></div><div class="toolbar-item"><button id="tool-gototop" title="返回顶部" type="button"><img src="/assets/images/svg/ta/ta-up.svg" class="icon noview" alt="Icon"></button></div></div></div><div class="search-overlay"><div class="search-container"><div class="search-header"><div class="search-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+搜索</div><div class="search-close-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 0 0 9 -9a9 9 0 0 0 -9 -9a9 9 0 0 0 -9 9a9 9 0 0 0 9 9z" /><path d="M9 8l6 8" /><path d="M15 8l-6 8" /></svg></div></div><div class="search-input-box"><input id="search-input" type="search" placeholder="请输入关键词进行站内搜索……" value="" maxlength="80"/></div><div class="search-result-container"><div class="search-result-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg></div></div></div></div><div id="music-player"></div></main><footer><div class="footer"><div id="footer-copyright">© 2026 <span>💗</span> <a href="/null">Liz Lee</a></div><div id="footer-info"><div id="footer-framework">🚀本站由 <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/chanwj/hexo-theme-meow" title="3.3.2" target="_blank">Meow</a> 强力驱动</div><div id="footer-runtime"><span id="runtime" data-startdate="2026-06-08T00:00:00.000Z">🌻已稳定运行.年.月.天</span></div></div></div></footer><div class="scripts"><script>const GLOBALCONFIG = {
+  root: '/',
+  toolbar: true,
+  lazyload_src: '/assets/images/Meow-Loading.webp',
+  friends: false,
+  album: '',
+  codeblock: true,
+  code_copy_text: false,
+  share_text: '🐱Share From Meow',
+  onblur_title: 'Please Come Back～✧(´▽`ʃ♡ƪ)',
+  mouse_click: false,
+  notify:{
+    enable: false,
+    info: '复制成功～转载请标注本文地址',
+    f12_info: '开发者模式已打开，请遵循本站版权协议'
+  },
+  search: {
+    enable: true,
+    path: 'search.xml',
+    local: {
+      top_n_per_article: 1,
+      preload: false
+    }
+  },
+  encrypt: false,
+  category: false,
+};
+</script><script>if (!localStorage.getItem('color-mode')) {
+  localStorage.setItem('color-mode', 'light' || 'light');
+}
+document.body.setAttribute('data-mode', localStorage.getItem('color-mode'));
+</script>
+<script src="/js/theme/tools/utils.js"></script>
+
+<script src="/js/plugins/dist/lazyload.min.js"></script>
+
+<script src="/js/plugins/view-image.min.js"></script>
+<script>if (localStorage.getItem('font-size')) {
+  document.querySelector('.post').style.fontSize = localStorage.getItem('font-size') + 'px';
+}
+</script>
+<script src="/js/plugins/dist/APlayer.min.js"></script>
+<script>const initAplayer = (data) => {
+  if (!data.length) return;
+
+  const ap = new APlayer({
+    container: document.getElementById('music-player'),
+    fixed: true,
+    autoplay: false,
+    theme: '#FFB347',
+    loop: 'all',
+    order: 'list',
+    volume: 0.7,
+    lrcType: 3,
+    audio: data
+  });
+
+  ap.on('play', () => {
+    document.getElementById('music-player').setAttribute("play", "");
+  });
+  ap.on('pause', () => {
+    document.getElementById('music-player').removeAttribute("play");
+  });
+};
+
+const fetchData = () => {
+  fetch('')
+    .then(res => res.json())
+    .then(result => initAplayer(result));
+};
+
+if ('') {
+  document.addEventListener("DOMContentLoaded", fetchData);
+} else {
+  document.addEventListener("DOMContentLoaded", initAplayer());;
+}</script>
+<script src="/js/plugins/dist/search.js"></script>
+
+<script src="/js/main.js" type="module"></script>
+</div></body></html>
