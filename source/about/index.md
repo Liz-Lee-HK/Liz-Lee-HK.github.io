@@ -8,15 +8,14 @@ layout: about
 
 你好,我是 **Liz Lee**——香港大学(HKU)在读学生,正在打磨成一名 **AI / LLM Agent 工程师**。
 
-> *"先用大白话讲清楚,再上面试深度。"*
+> *"Decisions first, Tricks second."*
 
 ---
 
 ### 🧁 在做什么 / Currently
 
-- 系统啃 **大模型 / Agent 八股**:Attention、Transformer、RLHF、ReAct、Multi-Agent、A2A、MCP …
-- 顺手做点 **DevOps**:Docker、CI/CD、本地脚本与小工具链
-- 这个站是我**复盘 + 输出**的地方
+- 专攻 **LLM / Agent** 方向：模型微调 (LoRA/SFT)、Prompt Engineering、RAG、Agent 框架 (LangChain/LangGraph)、MCP/A2A 协议
+- 项目实战为主，八股复盘为辅，这个站就是我的技术输出窗口
 
 ### 🌼 这个站长什么样
 

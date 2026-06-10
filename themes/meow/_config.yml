@@ -97,7 +97,7 @@ banner:
     enable: true # Whether to show subtitle
     # Subtitle text (Data type: Array)
     text:
-      - "AI / LLM Agent Engineer-in-training · HKU"
+      - "AI/LLM Agent Engineer"
     effect: false # Typewriter effect, true or false(only show the first text).
     type_speed: 100 # Typing speed (ms)
     back_speed: 150 # Backing speed (ms)
@@ -124,7 +124,7 @@ sidebar:
       emoji: 🐱 # false or emoji
       desc: # Describe the status
     link: # Url for image clicking
-    desc: HKU在读，AI / LLM Agent 工程师预备役。写八股也写代码，偶尔随手记。
+    desc: AI/LLM Agent Engineer，专注模型微调、Prompt Engineering与Agent开发。
     statistic: true # Whether to show the total number of articles, categories and tags
     social: # Social profiles
       enable: true # Whether to show social module
@@ -202,7 +202,7 @@ post:
     inner_text: # Text in reward module
     # Credits list
     reward_list:
-      enable: true # Whether to show credits list link
+      enable: false # Whether to show credits list link
       link: # Credits list link url
   # Post copyright module
   copyright:

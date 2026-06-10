@@ -4,7 +4,15 @@
       "Read(//Users/liruolin/Desktop/HKU/7706/**)",
       "Bash(python3 -c ' *)",
       "Bash(python3 generate_logbooks.py)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "WebSearch",
+      "WebFetch(domain:hackernoon.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh issue *)",
+      "Read(//Users/liruolin/Desktop/**)",
+      "Bash(pip3 list *)",
+      "Bash(pip3 install *)",
+      "Bash(brew install *)"
     ]
   }
 }
