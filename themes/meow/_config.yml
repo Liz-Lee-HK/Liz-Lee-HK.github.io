@@ -267,7 +267,7 @@ reward:
 # Share Customization
 share:
   notify: false # Whether to enable notification when copy text(Ctrl+C) or pressing F12
-  share_text: '🐱Share From Meow' # Text attached to the copied information
+  share_text: '🐱Share From Liz' # Text attached to the copied information
 
 # Essay Page
 essay:
