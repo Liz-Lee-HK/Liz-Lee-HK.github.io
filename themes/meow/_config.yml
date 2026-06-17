@@ -197,7 +197,7 @@ post:
     max_items: Infinity # Maximum number of items in generated toc, Infinity or number
   # Post reward module
   reward:
-    enable: false # Whether to show post reward module
+    enable: true # Whether to show post reward module
     outer_text: # Text under reward button
     inner_text: # Text in reward module
     # Credits list
