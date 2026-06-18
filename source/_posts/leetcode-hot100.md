@@ -1968,7 +1968,7 @@ def lowestCommonAncestor(self,root:'TreeNode', p:'TreeNode', q:'TreeNode')-> 'Tr
 解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
 ```
 
-![二叉树最大路径和示意图](/img/leetcode-124-max-path-sum.png)
+<img src="/img/leetcode-124-max-path-sum.png" alt="二叉树最大路径和示意图" width="50%">
  
 **解题思路：** 
 - 其实感觉有点像一笔画问题 不走回头路 不反复经过一个节点
