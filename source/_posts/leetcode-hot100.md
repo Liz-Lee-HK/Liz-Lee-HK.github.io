@@ -1926,10 +1926,12 @@ def isValidBST(root):  # 定义函数 isValidBST，接收参数: root
  
 **解题思路：** 
 递归法： 
-- 如果当前节点为空或等于 p 或 q，返回当前节点
-- 递归查找左子树和右子树
-- 如果左右子树都找到了节点，说明当前节点是最近公共祖先
-- 如果只有一边找到了，返回那一边的结果
+- 情况1:当前节点为空或等于 p 或 q，返回当前节点
+- 情况2:左右节点都找到了，返回root
+- 情况3:左/右节点找到了，返回递归那一边的结果
+- 情况4:左右子树都没有，返回空节点
+- 本质上是后序遍历，查询顺序-左右根
+- 时空复杂度o(n)
  
 **复杂度分析：** 
 - 时间复杂度：O(n)，其中 n 是二叉树的节点数
@@ -1940,16 +1942,16 @@ def isValidBST(root):  # 定义函数 isValidBST，接收参数: root
 ```python
 # 目的：二叉树的最近公共祖先
 # 思路：递归法：；如果当前节点为空或等于 p 或 q，返回当前节点递归查找左子树和右子树如果左右子树都找到了节点，说明当前节点是最近公共祖先如果只有一边找到了，返回那一边的结果
-def lowestCommonAncestor(root, p, q):  # 定义函数 lowestCommonAncestor，接收参数: root、p、q
-    if not root or root == p or root == q:  # 判断: not root or root == p or root == q
+def lowestCommonAncestor(self,root:'TreeNode', p:'TreeNode', q:'TreeNode')-> 'TreeNode': # 定义函数 lowestCommonAncestor，接收参数: root、p、q
+    if root is None or root is p or root is q:  
         return root  # 返回计算结果
 
     left = lowestCommonAncestor(root.left, p, q)  # left: 赋值/计算
     right = lowestCommonAncestor(root.right, p, q)  # right: 赋值/计算
 
-    if left and right:  # 判断: left and right
-        return root  # 返回计算结果
-    return left if left else right  # 返回计算结果
+    if left and right:  
+        return root  
+    return left if left else right  # 包含了左右都没有的情况
 ```
  
 ### 124. 二叉树中的最大路径和 (Binary Tree Maximum Path Sum)
@@ -1965,8 +1967,11 @@ def lowestCommonAncestor(root, p, q):  # 定义函数 lowestCommonAncestor，接
 输出：42
 解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
 ```
+
+![二叉树最大路径和示意图](/img/leetcode-124-max-path-sum.png)
  
 **解题思路：** 
+- 其实感觉有点像一笔画问题 不走回头路 不反复经过一个节点
 递归法： 
 - 定义辅助函数 `maxGain(node)` 返回以 node 为起点的最大路径和
 - 对于每个节点，计算：
